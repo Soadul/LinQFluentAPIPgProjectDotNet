@@ -21,38 +21,126 @@ namespace SoadPizza.ConsoleApp
         {
             while (true)
             {
-                Console.WriteLine("Choose an option:");
-                Console.WriteLine("1. Add Customer");
-                Console.WriteLine("2. Add Product");
-                Console.WriteLine("3. Show Customers");
-                Console.WriteLine("4. Show Products");
-                Console.WriteLine("5. Show Orders for a Customer");
-                Console.WriteLine("6. Show Products with Price Greater Than");
-                Console.WriteLine("7. Exit");
+                Console.WriteLine("Choose an entity:");
+                Console.WriteLine("1. Customer");
+                Console.WriteLine("2. Product");
+                Console.WriteLine("3. Order");
+                Console.WriteLine("4. Exit");
 
-                var choice = Console.ReadLine();
+                var entityChoice = Console.ReadLine();
 
-                switch (choice)
+                switch (entityChoice)
+                {
+                    case "1":
+                        HandleCustomerOperations();
+                        break;
+                    case "2":
+                        HandleProductOperations();
+                        break;
+                    case "3":
+                        HandleOrderOperations();
+                        break;
+                    case "4":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        private void HandleCustomerOperations()
+        {
+            while (true)
+            {
+                Console.WriteLine("Choose an operation for Customer:");
+                Console.WriteLine("1. Create");
+                Console.WriteLine("2. Read");
+                Console.WriteLine("3. Update");
+                Console.WriteLine("4. Delete");
+                Console.WriteLine("5. Back to main menu");
+
+                var operationChoice = Console.ReadLine();
+
+                switch (operationChoice)
                 {
                     case "1":
                         AddCustomer();
                         break;
                     case "2":
-                        AddProduct();
-                        break;
-                    case "3":
                         ShowCustomers();
                         break;
+                    case "3":
+                        UpdateCustomer();
+                        break;
                     case "4":
-                        ShowProducts();
+                        DeleteCustomer();
                         break;
                     case "5":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        private void HandleProductOperations()
+        {
+            while (true)
+            {
+                Console.WriteLine("Choose an operation for Product:");
+                Console.WriteLine("1. Create");
+                Console.WriteLine("2. Read");
+                Console.WriteLine("3. Update");
+                Console.WriteLine("4. Delete");
+                Console.WriteLine("5. Back to main menu");
+
+                var operationChoice = Console.ReadLine();
+
+                switch (operationChoice)
+                {
+                    case "1":
+                        AddProduct();
+                        break;
+                    case "2":
+                        ShowProducts();
+                        break;
+                    case "3":
+                        UpdateProduct();
+                        break;
+                    case "4":
+                        DeleteProduct();
+                        break;
+                    case "5":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        private void HandleOrderOperations()
+        {
+            while (true)
+            {
+                Console.WriteLine("Choose an operation for Order:");
+                Console.WriteLine("1. Show Orders for a Customer");
+                Console.WriteLine("2. Show Products with Price Greater Than");
+                Console.WriteLine("3. Back to main menu");
+
+                var operationChoice = Console.ReadLine();
+
+                switch (operationChoice)
+                {
+                    case "1":
                         ShowOrdersForCustomer();
                         break;
-                    case "6":
+                    case "2":
                         ShowProductsWithPriceGreaterThan();
                         break;
-                    case "7":
+                    case "3":
                         return;
                     default:
                         Console.WriteLine("Invalid choice. Please try again.");
@@ -201,6 +289,129 @@ namespace SoadPizza.ConsoleApp
             else
             {
                 Console.WriteLine("Invalid price. Please try again.");
+            }
+        }
+
+        private void UpdateCustomer()
+        {
+            Console.WriteLine("Enter Customer ID to update:");
+            if (int.TryParse(Console.ReadLine(), out var customerId))
+            {
+                var existingCustomer = _pizzaService.GetCustomers().FirstOrDefault(c => c.Id == customerId);
+                if (existingCustomer == null)
+                {
+                    Console.WriteLine("Customer not found.");
+                    return;
+                }
+
+                Console.WriteLine("Enter First Name:");
+                existingCustomer.FirstName = Console.ReadLine() ?? existingCustomer.FirstName;
+
+                Console.WriteLine("Enter Last Name:");
+                existingCustomer.LastName = Console.ReadLine() ?? existingCustomer.LastName;
+
+                Console.WriteLine("Enter Address:");
+                existingCustomer.Address = Console.ReadLine() ?? existingCustomer.Address;
+
+                Console.WriteLine("Enter Phone:");
+                existingCustomer.Phone = Console.ReadLine() ?? existingCustomer.Phone;
+
+                try
+                {
+                    _pizzaService.UpdateCustomer(existingCustomer);
+                    Console.WriteLine("Customer updated successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating customer: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Customer ID. Please try again.");
+            }
+        }
+
+        private void UpdateProduct()
+        {
+            Console.WriteLine("Enter Product ID to update:");
+            if (int.TryParse(Console.ReadLine(), out var productId))
+            {
+                var existingProduct = _pizzaService.GetProducts().FirstOrDefault(p => p.Id == productId);
+                if (existingProduct == null)
+                {
+                    Console.WriteLine("Product not found.");
+                    return;
+                }
+
+                Console.WriteLine("Enter Product Name:");
+                existingProduct.Name = Console.ReadLine() ?? existingProduct.Name;
+
+                Console.WriteLine("Enter Product Price:");
+                if (decimal.TryParse(Console.ReadLine(), out var price))
+                {
+                    existingProduct.Price = price;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid price. Keeping the old price.");
+                }
+
+                try
+                {
+                    _pizzaService.UpdateProduct(existingProduct);
+                    Console.WriteLine("Product updated successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating product: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Product ID. Please try again.");
+            }
+        }
+
+        private void DeleteCustomer()
+        {
+            Console.WriteLine("Enter Customer ID to delete:");
+            if (int.TryParse(Console.ReadLine(), out var customerId))
+            {
+                try
+                {
+                    _pizzaService.DeleteCustomer(customerId);
+                    Console.WriteLine("Customer deleted successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error deleting customer: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Customer ID. Please try again.");
+            }
+        }
+
+        private void DeleteProduct()
+        {
+            Console.WriteLine("Enter Product ID to delete:");
+            if (int.TryParse(Console.ReadLine(), out var productId))
+            {
+                try
+                {
+                    _pizzaService.DeleteProduct(productId);
+                    Console.WriteLine("Product deleted successfully.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error deleting product: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Product ID. Please try again.");
             }
         }
     }
